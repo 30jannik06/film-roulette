@@ -16,8 +16,8 @@ type Category = {
 };
 
 export const CATEGORIES: Category[] = [
-  // Keyword id filled in once determined via TMDB /search/keyword.
-  { id: "christmas", label: "Christmas" },
+  // TMDB-Keyword "christmas", ermittelt über https://www.themoviedb.org/keyword/207317-christmas
+  { id: "christmas", label: "Christmas", keywordId: 207317 },
   { id: "horror", label: "Horror", genreId: 27 },
   { id: "scifi", label: "Sci-Fi", genreId: 878 },
   { id: "comedy", label: "Komödie", genreId: 35 },

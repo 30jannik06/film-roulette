@@ -5,7 +5,7 @@ export function AIModeCard() {
         <h3 className="font-heading text-xl tracking-wide text-foreground">
           KI-Modus
         </h3>
-        <span className="rounded-full bg-accent px-2 py-0.5 text-xs text-foreground">
+        <span className="rounded-full bg-accent px-2 py-0.5 text-xs text-background">
           Phase 2
         </span>
       </div>

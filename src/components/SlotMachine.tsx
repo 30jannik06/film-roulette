@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { Reel } from "@/components/Reel";
 import { CATEGORIES } from "@/lib/categories";
 
@@ -27,7 +30,7 @@ export function SlotMachine({
   onSpin: () => void;
 }) {
   return (
-    <div className="w-full rounded-2xl border border-border bg-card p-4 sm:p-6">
+    <div className="w-full rounded-xl border border-border bg-card p-4 sm:p-6">
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
         <Reel
           key={`category-${spinId}`}
@@ -55,14 +58,16 @@ export function SlotMachine({
         />
       </div>
 
-      <button
+      <motion.button
         type="button"
         onClick={onSpin}
         disabled={spinning}
-        className="font-heading mt-5 w-full rounded-full bg-primary py-3 text-xl tracking-widest text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60 sm:mt-6"
+        whileHover={spinning ? undefined : { scale: 1.01 }}
+        whileTap={spinning ? undefined : { scale: 0.98 }}
+        className="font-heading mt-5 w-full rounded-lg bg-primary py-3 text-xl tracking-widest text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60 sm:mt-6"
       >
         {spinning ? "DREHT..." : "DREHEN"}
-      </button>
+      </motion.button>
     </div>
   );
 }

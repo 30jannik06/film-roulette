@@ -62,7 +62,7 @@ export function Reel({
           settled ? "border-primary" : "border-border"
         }`}
       >
-        <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-0.5 -translate-y-1/2 bg-accent" />
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-px -translate-y-1/2 bg-border" />
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.span
             key={display}

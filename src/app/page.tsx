@@ -7,21 +7,22 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ModeSwitch, type RouletteMode } from "@/components/ModeSwitch";
 import { ResultCard } from "@/components/ResultCard";
-import { SlotMachine } from "@/components/SlotMachine";
+import {
+  SlotMachine,
+  SLOT_MACHINE_TOTAL_SPIN_MS,
+  type ReelFinalValues,
+} from "@/components/SlotMachine";
 import { Toggle } from "@/components/Toggle";
-import type { CategoryId } from "@/lib/categories";
+import { buildRouletteFilters } from "@/lib/buildFilters";
+import { CATEGORIES, type CategoryId } from "@/lib/categories";
+import { getDecadeLabel } from "@/lib/decade";
+import { fetchRouletteResult } from "@/lib/mockRoulette";
 import type { RouletteResult } from "@/lib/types";
 
-const MOCK_RESULT: RouletteResult = {
-  id: 1,
-  title: "Der Schein trügt",
-  year: 2001,
-  runtimeMinutes: 108,
-  director: "Platzhalter-Regie",
-  overview:
-    "Platzhalter-Beschreibung. Sobald die API angebunden ist, steht hier die echte Filmbeschreibung.",
-  posterUrl: null,
-  letterboxdUrl: "https://letterboxd.com",
+const EMPTY_REEL_VALUES: ReelFinalValues = {
+  category: null,
+  decade: null,
+  movie: null,
 };
 
 export default function Home() {
@@ -33,6 +34,9 @@ export default function Home() {
   const [watchlistOnly, setWatchlistOnly] = useState(false);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<RouletteResult | null>(null);
+  const [reelValues, setReelValues] =
+    useState<ReelFinalValues>(EMPTY_REEL_VALUES);
+  const [spinId, setSpinId] = useState(0);
 
   function toggleCategory(id: CategoryId) {
     setSelectedCategories((current) =>
@@ -42,13 +46,32 @@ export default function Home() {
     );
   }
 
-  function handleSpin() {
+  async function handleSpin() {
     setSpinning(true);
     setResult(null);
+    setReelValues(EMPTY_REEL_VALUES);
+    setSpinId((id) => id + 1);
+
+    const filters = buildRouletteFilters(mode, selectedCategories);
+    // Das Ergebnis steht fest, BEVOR die Walzen gezielt darauf animiert werden.
+    const nextResult = await fetchRouletteResult(filters);
+
+    const categoryLabel =
+      mode === "category" && selectedCategories.length > 0
+        ? CATEGORIES.find((c) => c.id === selectedCategories[0])?.label ??
+          "Random"
+        : "Random";
+
+    setReelValues({
+      category: categoryLabel.toUpperCase(),
+      decade: getDecadeLabel(nextResult.year),
+      movie: nextResult.title.toUpperCase(),
+    });
+
     window.setTimeout(() => {
+      setResult(nextResult);
       setSpinning(false);
-      setResult(MOCK_RESULT);
-    }, 600);
+    }, SLOT_MACHINE_TOTAL_SPIN_MS);
   }
 
   return (
@@ -79,8 +102,9 @@ export default function Home() {
         </div>
 
         <SlotMachine
-          values={{ category: "?", decade: "?", movie: "?" }}
+          values={reelValues}
           spinning={spinning}
+          spinId={spinId}
           onSpin={handleSpin}
         />
 

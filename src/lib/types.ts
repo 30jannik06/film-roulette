@@ -1,3 +1,10 @@
+export type RouletteFilters = {
+  genreIds: number[];
+  keywordIds: number[];
+  decade: number | null;
+  maxRuntime: number | null;
+};
+
 export type RouletteResult = {
   id: number;
   title: string;

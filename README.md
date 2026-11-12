@@ -8,10 +8,11 @@ Stack: Next.js 16 (App Router, TypeScript), Tailwind v4, Framer Motion, Better A
 
 ## Setup (lokal)
 
-1. Abhängigkeiten installieren:
+1. Abhängigkeiten installieren ([pnpm](https://pnpm.io) ist der Paketmanager
+   dieses Projekts, siehe `packageManager` in `package.json`):
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. `.env.example` nach `.env.local` kopieren und ausfüllen (siehe unten).
@@ -19,7 +20,7 @@ Stack: Next.js 16 (App Router, TypeScript), Tailwind v4, Framer Motion, Better A
 3. Dev-Server starten:
 
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
    Läuft unter [http://localhost:3000](http://localhost:3000). Ohne `TMDB_READ_TOKEN`

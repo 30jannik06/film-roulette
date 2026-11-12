@@ -1,6 +1,10 @@
-import type { RouletteFilters, RouletteResult } from "@/lib/types";
+import type { RouletteResult } from "@/lib/types";
 
-const MOCK_MOVIES: RouletteResult[] = [
+/**
+ * Fallback-Daten für /api/roulette, solange kein TMDB_READ_TOKEN gesetzt ist.
+ * So funktioniert die App auch ganz ohne Account/Token.
+ */
+export const MOCK_MOVIES: RouletteResult[] = [
   {
     id: 1,
     title: "Der Schein trügt",
@@ -8,7 +12,7 @@ const MOCK_MOVIES: RouletteResult[] = [
     runtimeMinutes: 108,
     director: "Platzhalter-Regie",
     overview:
-      "Platzhalter-Beschreibung. Sobald die API angebunden ist, steht hier die echte Filmbeschreibung.",
+      "Platzhalter-Beschreibung. Ohne TMDB_READ_TOKEN liefert /api/roulette diese Mock-Filme.",
     posterUrl: null,
     letterboxdUrl: "https://letterboxd.com",
   },
@@ -34,11 +38,6 @@ const MOCK_MOVIES: RouletteResult[] = [
   },
 ];
 
-/** Simulierte Netzwerklatenz, damit sich das Drehen auch ohne echte API richtig anfühlt. */
-export async function fetchRouletteResult(
-  filters: RouletteFilters,
-): Promise<RouletteResult> {
-  void filters; // berücksichtigt erst die echte API in /api/roulette
-  await new Promise((resolve) => setTimeout(resolve, 300));
+export function pickRandomMockMovie(): RouletteResult {
   return MOCK_MOVIES[Math.floor(Math.random() * MOCK_MOVIES.length)];
 }

@@ -16,7 +16,7 @@ import { Toggle } from "@/components/Toggle";
 import { buildRouletteFilters } from "@/lib/buildFilters";
 import { CATEGORIES, type CategoryId } from "@/lib/categories";
 import { getDecadeLabel } from "@/lib/decade";
-import { fetchRouletteResult } from "@/lib/mockRoulette";
+import { fetchRouletteResult } from "@/lib/fetchRoulette";
 import type { RouletteResult } from "@/lib/types";
 
 const EMPTY_REEL_VALUES: ReelFinalValues = {
@@ -37,6 +37,7 @@ export default function Home() {
   const [reelValues, setReelValues] =
     useState<ReelFinalValues>(EMPTY_REEL_VALUES);
   const [spinId, setSpinId] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   function toggleCategory(id: CategoryId) {
     setSelectedCategories((current) =>
@@ -49,29 +50,36 @@ export default function Home() {
   async function handleSpin() {
     setSpinning(true);
     setResult(null);
+    setError(null);
     setReelValues(EMPTY_REEL_VALUES);
     setSpinId((id) => id + 1);
 
     const filters = buildRouletteFilters(mode, selectedCategories);
-    // Das Ergebnis steht fest, BEVOR die Walzen gezielt darauf animiert werden.
-    const nextResult = await fetchRouletteResult(filters);
 
-    const categoryLabel =
-      mode === "category" && selectedCategories.length > 0
-        ? CATEGORIES.find((c) => c.id === selectedCategories[0])?.label ??
-          "Random"
-        : "Random";
+    try {
+      // Das Ergebnis steht fest, BEVOR die Walzen gezielt darauf animiert werden.
+      const nextResult = await fetchRouletteResult(filters);
 
-    setReelValues({
-      category: categoryLabel.toUpperCase(),
-      decade: getDecadeLabel(nextResult.year),
-      movie: nextResult.title.toUpperCase(),
-    });
+      const categoryLabel =
+        mode === "category" && selectedCategories.length > 0
+          ? CATEGORIES.find((c) => c.id === selectedCategories[0])?.label ??
+            "Random"
+          : "Random";
 
-    window.setTimeout(() => {
-      setResult(nextResult);
+      setReelValues({
+        category: categoryLabel.toUpperCase(),
+        decade: getDecadeLabel(nextResult.year),
+        movie: nextResult.title.toUpperCase(),
+      });
+
+      window.setTimeout(() => {
+        setResult(nextResult);
+        setSpinning(false);
+      }, SLOT_MACHINE_TOTAL_SPIN_MS);
+    } catch {
       setSpinning(false);
-    }, SLOT_MACHINE_TOTAL_SPIN_MS);
+      setError("Drehen fehlgeschlagen. Bitte erneut versuchen.");
+    }
   }
 
   return (
@@ -107,6 +115,8 @@ export default function Home() {
           spinId={spinId}
           onSpin={handleSpin}
         />
+
+        {error && <p className="text-sm text-accent">{error}</p>}
 
         {result && <ResultCard result={result} onSpinAgain={handleSpin} />}
 

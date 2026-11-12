@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AIModeCard } from "@/components/AIModeCard";
 import { CategoryChips } from "@/components/CategoryChips";
 import { Footer } from "@/components/Footer";
@@ -13,6 +14,7 @@ import {
   type ReelFinalValues,
 } from "@/components/SlotMachine";
 import { Toggle } from "@/components/Toggle";
+import { authClient } from "@/lib/auth-client";
 import { buildRouletteFilters } from "@/lib/buildFilters";
 import { CATEGORIES, type CategoryId } from "@/lib/categories";
 import { getDecadeLabel } from "@/lib/decade";
@@ -26,6 +28,19 @@ const EMPTY_REEL_VALUES: ReelFinalValues = {
 };
 
 export default function Home() {
+  const router = useRouter();
+  const { data: session, isPending: sessionPending } =
+    authClient.useSession();
+
+  // Die Proxy-Prüfung (middleware) schaut nur, ob irgendein Session-Cookie
+  // existiert, nicht ob es gültig ist. Ist die Session ungültig/abgelaufen,
+  // landen wir sonst mit kaputter Seite hier statt auf /login.
+  useEffect(() => {
+    if (!sessionPending && !session) {
+      router.replace("/login");
+    }
+  }, [sessionPending, session, router]);
+
   const [mode, setMode] = useState<RouletteMode>("random");
   const [selectedCategories, setSelectedCategories] = useState<CategoryId[]>(
     [],
@@ -80,6 +95,10 @@ export default function Home() {
       setSpinning(false);
       setError("Drehen fehlgeschlagen. Bitte erneut versuchen.");
     }
+  }
+
+  if (sessionPending || !session) {
+    return <div className="min-h-full flex-1 bg-background" />;
   }
 
   return (

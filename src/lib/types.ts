@@ -3,6 +3,7 @@ export type RouletteFilters = {
   keywordIds: number[];
   decade: number | null;
   maxRuntime: number | null;
+  minRating: number | null;
 };
 
 export type RouletteResult = {

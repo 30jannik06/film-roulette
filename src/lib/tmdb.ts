@@ -50,6 +50,11 @@ function buildDiscoverParams(filters: RouletteFilters, page: number) {
   if (filters.maxRuntime !== null) {
     params.set("with_runtime.lte", String(filters.maxRuntime));
   }
+  if (filters.minRating !== null) {
+    params.set("vote_average.gte", String(filters.minRating));
+    // Ohne Mindest-Stimmenzahl würden Filme mit nur 1-2 Stimmen die Bewertung verzerren.
+    params.set("vote_count.gte", "50");
+  }
   return params;
 }
 

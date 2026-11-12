@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AIModeCard } from "@/components/AIModeCard";
 import { CategoryChips } from "@/components/CategoryChips";
+import { FilterChips } from "@/components/FilterChips";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ModeSwitch, type RouletteMode } from "@/components/ModeSwitch";
@@ -19,6 +20,14 @@ import { buildRouletteFilters } from "@/lib/buildFilters";
 import { CATEGORIES, type CategoryId } from "@/lib/categories";
 import { getDecadeLabel } from "@/lib/decade";
 import { fetchRouletteResult } from "@/lib/fetchRoulette";
+import {
+  DECADE_OPTIONS,
+  RATING_OPTIONS,
+  RUNTIME_OPTIONS,
+  type DecadeValue,
+  type RatingValue,
+  type RuntimeValue,
+} from "@/lib/filterOptions";
 import type { RouletteResult } from "@/lib/types";
 
 const EMPTY_REEL_VALUES: ReelFinalValues = {
@@ -45,6 +54,9 @@ export default function Home() {
   const [selectedCategories, setSelectedCategories] = useState<CategoryId[]>(
     [],
   );
+  const [decade, setDecade] = useState<DecadeValue>("any");
+  const [maxRuntime, setMaxRuntime] = useState<RuntimeValue>("any");
+  const [minRating, setMinRating] = useState<RatingValue>("any");
   const [excludeWatched, setExcludeWatched] = useState(false);
   const [watchlistOnly, setWatchlistOnly] = useState(false);
   const [spinning, setSpinning] = useState(false);
@@ -69,7 +81,13 @@ export default function Home() {
     setReelValues(EMPTY_REEL_VALUES);
     setSpinId((id) => id + 1);
 
-    const filters = buildRouletteFilters(mode, selectedCategories);
+    const filters = buildRouletteFilters({
+      mode,
+      selectedCategories,
+      decade,
+      maxRuntime,
+      minRating,
+    });
 
     try {
       // Das Ergebnis steht fest, BEVOR die Walzen gezielt darauf animiert werden.
@@ -114,6 +132,27 @@ export default function Home() {
             onToggle={toggleCategory}
           />
         )}
+
+        <div className="flex flex-wrap justify-center gap-6">
+          <FilterChips
+            label="Jahrzehnt"
+            options={DECADE_OPTIONS}
+            value={decade}
+            onChange={setDecade}
+          />
+          <FilterChips
+            label="Laufzeit"
+            options={RUNTIME_OPTIONS}
+            value={maxRuntime}
+            onChange={setMaxRuntime}
+          />
+          <FilterChips
+            label="Bewertung"
+            options={RATING_OPTIONS}
+            value={minRating}
+            onChange={setMinRating}
+          />
+        </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
           <Toggle

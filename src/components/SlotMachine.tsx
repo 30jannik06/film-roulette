@@ -1,4 +1,5 @@
 import { Reel } from "@/components/Reel";
+import { CATEGORIES } from "@/lib/categories";
 
 export type ReelFinalValues = {
   category: string | null;
@@ -8,12 +9,7 @@ export type ReelFinalValues = {
 
 const CATEGORY_CANDIDATES = [
   "RANDOM",
-  "HORROR",
-  "SCI-FI",
-  "KOMÖDIE",
-  "THRILLER",
-  "ANIMATION",
-  "CHRISTMAS",
+  ...CATEGORIES.map((category) => category.label.toUpperCase()),
 ];
 const DECADE_CANDIDATES = ["1970er", "1980er", "1990er", "2000er", "2010er", "2020er"];
 const MOVIE_CANDIDATES = ["FILM", "KINO", "SZENE", "ROLLE", "TAKE", "SPULE"];

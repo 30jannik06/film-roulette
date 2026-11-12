@@ -1,19 +1,30 @@
 import { CATEGORIES, type CategoryId } from "@/lib/categories";
+import type { DecadeValue, RatingValue, RuntimeValue } from "@/lib/filterOptions";
 import type { RouletteFilters } from "@/lib/types";
 import type { RouletteMode } from "@/components/ModeSwitch";
 
-export function buildRouletteFilters(
-  mode: RouletteMode,
-  selectedCategories: CategoryId[],
-): RouletteFilters {
+export function buildRouletteFilters({
+  mode,
+  selectedCategories,
+  decade,
+  maxRuntime,
+  minRating,
+}: {
+  mode: RouletteMode;
+  selectedCategories: CategoryId[];
+  decade: DecadeValue;
+  maxRuntime: RuntimeValue;
+  minRating: RatingValue;
+}): RouletteFilters {
   const filters: RouletteFilters = {
     genreIds: [],
     keywordIds: [],
-    decade: null,
-    maxRuntime: null,
+    decade: decade === "any" ? null : Number(decade),
+    maxRuntime: maxRuntime === "any" ? null : Number(maxRuntime),
+    minRating: minRating === "any" ? null : Number(minRating),
   };
 
-  if (mode === "random") {
+  if (mode !== "category") {
     return filters;
   }
 

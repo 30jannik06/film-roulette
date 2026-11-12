@@ -85,6 +85,31 @@ Das erzeugt einen neuen Commit, der die Änderung rückgängig macht, und löst 
 Vercel automatisch ein neues Deployment aus. Alternativ in Vercel unter
 **Deployments** ein älteres Deployment auswählen und "Promote to Production".
 
+## Deploy (Docker / eigener Server)
+
+1. `.env` im Projektordner auf dem Server anlegen (gleiche Variablen wie oben,
+   `BETTER_AUTH_URL` auf die echte Domain setzen).
+2. Bauen und starten:
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+   `docker-compose.yml` bindet den Container an `127.0.0.1:3100` (kein
+   öffentlicher Port) und hängt ihn an das externe Docker-Netzwerk `proxy-net` –
+   gedacht für einen Reverse Proxy (z. B. Nginx Proxy Manager) davor, der die
+   Domain terminiert.
+3. Reverse-Proxy-Eintrag auf `127.0.0.1:3100` zeigen lassen, HTTPS dort
+   terminieren, Redirect-URI im Discord Developer Portal für diese Domain
+   ergänzen (siehe oben).
+
+### Rollback (Docker)
+
+```bash
+git revert <commit-hash> && git push
+docker compose up -d --build
+```
+
 ## Umfang / Stand
 
 Enthalten: Grundlayout, Slot-Maschine mit deterministischer Spin-Logik,

@@ -1,0 +1,16 @@
+services:
+  film-roulette:
+    build: .
+    image: film-roulette:latest
+    container_name: film-roulette
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:3100:3000"
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    external: true

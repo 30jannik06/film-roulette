@@ -1,7 +1,7 @@
 # Film Roulette
 
 Persönlicher Film-Slot-Automat: Walzen für Kategorie/Jahrzehnt/Film, gespeist aus TMDB,
-Zugriff nur für einen einzelnen Discord-Account.
+Zugriff nur für vorher freigeschaltete Discord-Accounts.
 
 Stack: Next.js 16 (App Router, TypeScript), Tailwind v4, Framer Motion, Better Auth
 (stateless, kein DB-Server nötig).
@@ -36,7 +36,7 @@ Stack: Next.js 16 (App Router, TypeScript), Tailwind v4, Framer Motion, Better A
 | `BETTER_AUTH_SECRET` | ja | Mind. 32 Zeichen, z. B. `openssl rand -base64 32` |
 | `BETTER_AUTH_URL` | ja | Basis-URL der App (lokal `http://localhost:3000`) |
 | `DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` | ja | aus dem Discord Developer Portal |
-| `ALLOWED_DISCORD_ID` | ja | Deine Discord-User-ID; jeder andere Login wird abgelehnt |
+| `ALLOWED_DISCORD_IDS` | ja | Komma-getrennte Discord-User-IDs (z. B. du + ein Kumpel); jeder andere Login wird abgelehnt |
 | `AI_PROVIDER`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY` | nein | Platzhalter für Phase 2 (KI-Modus), aktuell ohne Funktion |
 
 ### TMDB-Token holen
@@ -55,12 +55,18 @@ Stack: Next.js 16 (App Router, TypeScript), Tailwind v4, Framer Motion, Better A
    - Lokal: `http://localhost:3000/api/auth/callback/discord`
    - Produktion (Vercel): `https://<deine-domain>/api/auth/callback/discord`
      (bei beiden Umgebungen eintragen, nicht nur bei der aktuell genutzten)
-4. Eigene Discord-User-ID ermitteln: Discord-Einstellungen → Erweitert →
-   Entwicklermodus aktivieren, dann Rechtsklick auf den eigenen Namen →
-   "ID kopieren" → als `ALLOWED_DISCORD_ID` eintragen.
+4. Discord-User-IDs ermitteln: Discord-Einstellungen → Erweitert →
+   Entwicklermodus aktivieren, dann Rechtsklick auf den jeweiligen Namen →
+   "ID kopieren" → komma-getrennt als `ALLOWED_DISCORD_IDS` eintragen
+   (z. B. `123456789012345678,987654321098765432` für dich + einen Kumpel).
 
-Jeder Login-Versuch mit einer anderen Discord-ID wird serverseitig abgelehnt
-(`user.validateUserInfo` in `src/lib/auth.ts`), nicht nur in der UI.
+Jeder Login-Versuch mit einer nicht gelisteten Discord-ID wird serverseitig abgelehnt
+(`user.validateUserInfo` in `src/lib/auth.ts`), nicht nur in der UI. Um jemanden
+freizuschalten, reicht es, seine ID zu `ALLOWED_DISCORD_IDS` hinzuzufügen und den
+Dienst neu zu starten (lokal: Dev-Server neu starten; Docker: `docker compose up -d`;
+Vercel: Env-Variable ändern löst automatisch ein neues Deployment aus) — ein eigener
+Discord-Account auf eurer Seite reicht, es muss nichts im Discord Developer Portal
+geändert werden.
 
 ## Deploy (Vercel)
 
@@ -114,7 +120,7 @@ docker compose up -d --build
 
 Enthalten: Grundlayout, Slot-Maschine mit deterministischer Spin-Logik,
 `/api/roulette` (TMDB-Discover + Mock-Fallback), Christmas-Kategorie über ein
-TMDB-Keyword, Discord-Login via Better Auth (stateless, auf eine ID beschränkt),
+TMDB-Keyword, Discord-Login via Better Auth (stateless, auf eine Liste freigeschalteter IDs beschränkt),
 `/api/suggest` als 501-Platzhalter für Phase 2.
 
 Nicht enthalten (bewusst außerhalb dieses Durchlaufs): Letterboxd-CSV-Import,

@@ -1,5 +1,11 @@
 import { betterAuth } from "better-auth";
 
+/** Komma-getrennte Liste von Discord-User-IDs, z.B. "123,456". */
+const allowedDiscordIds = (process.env.ALLOWED_DISCORD_IDS ?? "")
+  .split(",")
+  .map((id) => id.trim())
+  .filter(Boolean);
+
 /**
  * Stateless Setup: keine `database`-Option, Better Auth hält Sessions
  * ausschließlich in einem signierten/verschlüsselten Cookie
@@ -14,13 +20,13 @@ export const auth = betterAuth({
   },
   user: {
     // Läuft bei jedem Discord-Login (auch im Stateless-Modus) und lehnt
-    // jeden Login ab, der nicht von ALLOWED_DISCORD_ID kommt – bevor
-    // überhaupt eine Session ausgestellt wird.
+    // jeden Login ab, dessen Discord-ID nicht in ALLOWED_DISCORD_IDS steht –
+    // bevor überhaupt eine Session ausgestellt wird.
     validateUserInfo: ({ source }) => {
       if (source.oauth?.providerId !== "discord") return;
 
       const profile = source.oauth.profile as { id?: string } | undefined;
-      if (profile?.id !== process.env.ALLOWED_DISCORD_ID) {
+      if (!profile?.id || !allowedDiscordIds.includes(profile.id)) {
         return {
           error: "not_allowed",
           errorDescription: "Dieser Discord-Account ist nicht freigeschaltet.",
